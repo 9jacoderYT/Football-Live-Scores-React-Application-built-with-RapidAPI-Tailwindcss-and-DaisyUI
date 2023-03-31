@@ -1,53 +1,60 @@
+import { useEffect, useState } from "react";
 import "./App.css";
-
-// Material UI imports
-import Chip from "@mui/material/Chip";
-import FaceIcon from "@mui/icons-material/Face";
-import Paper from "@mui/material/Paper";
-import LockIcon from "@mui/icons-material/Lock";
-
-import Switch from "@mui/material/Switch";
-import { useState } from "react";
-import Login from "./formControl/login";
-import Signup from "./formControl/signup";
+import NavBar from "./components/navbar";
+import { fetchFixtures } from "./lib/fetch-data";
+import { data } from "./lib/dummy-data";
+import Table from "./components/table";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Fixture from "./components/fixture";
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
+import CachedIcon from "@mui/icons-material/Cached";
 
 function App() {
-  const [checked, setChecked] = useState(true);
+  const [fixtures, setFixtures] = useState(data);
 
-  const handleChange = (event) => {
-    setChecked(event.target.checked);
-  };
+  // Uncomment this part if you want it to  fetch data from RAPIDAPI
+  // const fetchInfo = async () => {
+  //   const data = await fetchFixtures();
+  //   setFixtures(data);
+  // };
+
+  // useEffect(() => {
+  //   fetchInfo();
+  // }, []);
+
+  console.log(fixtures);
+
+  const refresh = () => window.location.reload(true);
 
   return (
-    <div className="App">
-      <Paper elevation={3} style={{ padding: "10px", paddingBottom: "50px" }}>
-        <div align="center">
-          {checked ? (
-            <Chip
-              icon={<LockIcon />}
-              label="Log In"
-              variant="outlined"
-              color="info"
-            />
-          ) : (
-            <Chip
-              icon={<FaceIcon />}
-              label="Sign Up"
-              variant="outlined"
-              color="info"
-            />
-          )}
-          <br />
+    <div className="w-full md:w-[700px]  lg:w-[800px] m-auto">
+      <NavBar />
 
-          <Switch
-            checked={checked}
-            onChange={handleChange}
-            inputProps={{ "aria-label": "controlled" }}
-          />
+      <button
+        onClick={refresh}
+        className="btn btn-sm fixed bottom-3 right-2 z-40"
+      >
+        <CachedIcon />
+      </button>
+
+      {fixtures.length == 0 ? (
+        <div className="h-screen bg-white w-full text-center p-10">
+          <Box>
+            <CircularProgress />
+          </Box>
         </div>
-
-        {checked ? <Login /> : <Signup />}
-      </Paper>
+      ) : (
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Table data={fixtures} />}></Route>
+            <Route
+              path="/fixture/:matchID"
+              element={<Fixture data={fixtures} />}
+            ></Route>
+          </Routes>
+        </BrowserRouter>
+      )}
     </div>
   );
 }
